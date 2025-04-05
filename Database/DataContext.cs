@@ -17,8 +17,8 @@ namespace turipaq.Database
             }
             public DbSet<Clientes> Clientes { get; set; }
             public DbSet<PaqueteTuristico> Paquete_Turisticos { get; set; }
-            public DbSet<Clientes> Pagos { get; set; }
-            public DbSet<Clientes> Reservas { get; set; }
+            public DbSet<Pago> Pagos { get; set; }
+            public DbSet<Reserva> Reservas { get; set; }
        
        }
 

@@ -36,7 +36,7 @@ namespace turipaq.Business_Logic
                 PaqueteId = id,
                 Destino = destino,
                 Duracion = duracion,
-                precio = tipoViaje,
+                precio = precio,
                 TipoViaje = tipoViaje,
                 disponibilidad = disponible
             };
@@ -72,7 +72,7 @@ namespace turipaq.Business_Logic
             public static PaqueteTuristico BuscarPaquete()
             {
                 var context = new DataContext();
-                Console.WriteLine("Digite un Id de Contacto Para Mostrar");
+                Console.WriteLine("Digite un Id de Paquete Para Mostrar");
                 int selectedId = Convert.ToInt32(Console.ReadLine());
 
                 var paquete = context.Paquete_Turisticos.FirstOrDefault(p => p.PaqueteId == selectedId);
@@ -121,33 +121,32 @@ namespace turipaq.Business_Logic
                 verPaqueteEnPantalla(paquetes);
             }
 
-            public static void EditarPaquetes()
-            {
+        public static void EditarPaquetes()
+        {
 
-                var context = new DataContext();
-                Console.WriteLine("Digite un  Id del paquete Para Editar");
-                int selectedId = Convert.ToInt32(Console.ReadLine());
-                var paquete = context.Paquete_Turisticos.Where(p => p.PaqueteId == selectedId).FirstOrDefault();
-                Console.Write($"El Destino es: {paquete.Destino}, Digite el Nuevo Destino: ");
-                var Destino = Console.ReadLine();
-                Console.Write($"la duracion del paquete es: {paquete.Duracion}, Digite la nueva duracion ");
-                var Duracion = Console.ReadLine();
-                Console.Write($"El precio del paquete es: {paquete.precio}, Digite el Nuevo Precio: ");
-                var precio = Console.ReadLine();
-                Console.Write($"El Tipo de viaje es: {paquete.TipoViaje}, Digite un Nuevo tipo de viaje: ");
-                var TipoViaje = Console.ReadLine();
-                Console.Write($"el paquete : {paquete.disponibilidad}, ingrese  1 esta disponible o 2. no esta disponible: ");
-                bool disponibilidad ;
-              var disponibilidadstr = (disponibilidad = true) ? "si" : "no";
+            var context = new DataContext();
+            Console.WriteLine("Digite un  Id del paquete Para Editar");
+            int selectedId = Convert.ToInt32(Console.ReadLine());
+            var paquete = context.Paquete_Turisticos.Where(p => p.PaqueteId == selectedId).FirstOrDefault();
+            Console.Write($"El Destino es: {paquete.Destino}, Digite el Nuevo Destino: ");
+            var Destino = Console.ReadLine();
+            Console.Write($"la duracion del paquete es: {paquete.Duracion}, Digite la nueva duracion ");
+            var Duracion = Console.ReadLine();
+            Console.Write($"El precio del paquete es: {paquete.precio}, Digite el Nuevo Precio: ");
+            var precio = Console.ReadLine();
+            Console.Write($"El Tipo de viaje es: {paquete.TipoViaje}, Digite un Nuevo tipo de viaje: ");
+            var TipoViaje = Console.ReadLine();
+            Console.Write($"el paquete : {paquete.disponibilidad}, ingrese  1 esta disponible o 2. no esta disponible: ");
+            bool disponibilidad;
+            var disponibilidadstr = (disponibilidad = true) ? "si" : "no";
 
-            
-                
 
-               paquete.Destino = Destino;
-                paquete.Duracion = Duracion;
-                paquete.precio = precio;
-                paquete.TipoViaje = TipoViaje;
-                paquete.disponibilidad = disponibilidad;
+
+            paquete.Destino = Destino;
+            paquete.Duracion = Duracion;
+            paquete.precio = precio;
+            paquete.TipoViaje = TipoViaje;
+            paquete.disponibilidad = disponibilidad;
 
             if (paquete != null)
             {
