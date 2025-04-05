@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace turipaq.entities_model
 {
-    internal class Pago
+    public class Pago
     {
+        public int PagoId { get; set; }
+        public int ClienteId { get; set; }
+        public int ReservaID { get; set; }
+        public string FechaPago { get; set; }
+        public bool EstadoPago { get; set; }
+
     }
 }
