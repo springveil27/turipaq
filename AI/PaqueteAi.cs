@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using turipaq.Business_Logic;
+using Microsoft.EntityFrameworkCore;
+using turipaq.Logic;
 using turipaq.entities_model;
-using turipaq.Database;
-
-
-namespace turipaq.UI
+namespace turipaq.AI
 {
-    class Program
+    class PaqueteAi
     {
-        static void Main(string[] args)
+     public static void Menupaq()
         {
             List<PaqueteTuristico> paquetes = new List<PaqueteTuristico>();
 
-            bool back = false;
-            while (!back)
+            bool backanother = true;
+            while (backanother)
             {
                 Console.Clear();
                 Console.WriteLine("===== MENÚ DE PAQUETES TURÍSTICOS =====");
@@ -24,7 +22,8 @@ namespace turipaq.UI
                 Console.WriteLine("3. Buscar paquete");
                 Console.WriteLine("4. Editar un paquete");
                 Console.WriteLine("5. Eliminar un paquete");
-                Console.WriteLine("6. Salir");
+                Console.WriteLine("6. Volver al menu principal");
+                Console.WriteLine("======================================");
                 Console.Write("Seleccione una opción: ");
 
                 string option = Console.ReadLine();
@@ -32,14 +31,17 @@ namespace turipaq.UI
                 switch (option)
                 {
                     case "1":
+                        Console.Clear();
                         PaqueteBL.AgregarPaquete(paquetes);
                         break;
 
                     case "2":
+                        Console.Clear();
                         PaqueteBL.verPaquetes(paquetes);
                         break;
 
                     case "3":
+                        Console.Clear();
                         Console.WriteLine("opcion a utilizar para buscar el Paquete: 1. ID 2.Destino  3. Tipo de viaje 4 .duraccion");
                         var OptionSearch = int.Parse(Console.ReadLine());
                         if (OptionSearch == 1)
@@ -58,15 +60,19 @@ namespace turipaq.UI
                         break;
 
                     case "4":
+                        Console.Clear();
                         PaqueteBL.EditarPaquetes();
                         break;
 
                     case "5":
+                        Console.Clear();
                         PaqueteBL.EliminarPaquete(paquetes);
                         break;
 
                     case "6":
-                        back = true;
+                        
+                        backanother = false;
+                       
                         break;
 
                     default:
