@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using turipaq.entities_model;
-using turipaq.Logic;
-using turipaq.AI;
 
 namespace turipaq.Database
 {

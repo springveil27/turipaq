@@ -19,7 +19,7 @@ namespace turipaq.Login
 
         public static void Logout() => UsuarioIniciado = null;
         
-        public static bool EsAdmin() =>  UsuarioIniciado != null && UsuarioIniciado.Admin.GetValueOrDefault();
+        public static bool EsAdmin() =>  UsuarioIniciado != null && UsuarioIniciado.Admin;
         
     }
 }

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using turipaq.Database;
+﻿using turipaq.Database;
 using turipaq.entities_model;
-using System.Runtime.CompilerServices;
+
 
 namespace turipaq.Logic.LogicAdmin
 {
@@ -14,54 +9,61 @@ namespace turipaq.Logic.LogicAdmin
 
         public static int GeneradorID(int count) => count++;
 
-        public static void AgregarPaquete(List<PaqueteTuristico> paquete)
+        public static void AgregarPaquete(List<PaqueteTuristico>paquetes)
         {
+            var context = new DataContext();
             Console.WriteLine("===== CREAR PAQUETES TURÍSTICOS ====="); ;
-            var id = GeneradorID(paquete.Count());
+            var id = GeneradorID(paquetes.Count());
             Console.Write("Destino de viaje ");
             var destino = Console.ReadLine();
             Console.Write("Duracion del viaje: ");
             var duracion = Console.ReadLine();
-            Console.Write("Precio: ");
-            var precio = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Precio $: ");
+            int precio = Convert.ToInt32(Console.ReadLine());
             Console.Write("Tipo De viaje: ");
             var tipoViaje = Console.ReadLine();
-            Console.Write("Disponible 1. SI  2.NO: ");
-            bool disponible = Convert.ToInt32(Console.ReadLine()) == 1;
+            Console.Write("Disponible 1. Si  2.No: ");
+            bool disponible = Convert.ToInt32(Console.ReadLine()) == 2;
             Console.WriteLine();
 
+            
             var paqueteTuristico = new PaqueteTuristico()
             {
                 PaqueteId = id,
                 Destino = destino,
                 Duracion = duracion,
-                precio = precio,
+                Precio = precio,
                 TipoViaje = tipoViaje,
-                disponibilidad = disponible
+                Disponibilidad = disponible
             };
-            var context = new DataContext();
             context.Paquete_Turisticos.Add(paqueteTuristico);
             context.SaveChanges();
         }
 
-        
-
+       
 
         public static void verPaqueteEnPantalla(List<PaqueteTuristico> paquetes)
         {
-
-
+        
+            if (!paquetes.Any())
+            {
+                Console.WriteLine("No hay paquete disponible");
+            }
+                
+            
             foreach (var paquete in paquetes)
             {
-                Console.WriteLine($"|ID: {paquete.PaqueteId} | Destino: {paquete.Destino} |Duracion: {paquete.Duracion}|  Precio: {paquete.precio}  | Disponible: {paquete.disponibilidad} | Tipo de viaje: {paquete.TipoViaje} |");
+                var disponibilidadStr = (paquete.Disponibilidad == true ? "disponible" : "No disponible");
+                Console.WriteLine($"|ID: {paquete.PaqueteId} | Destino: {paquete.Destino} |Duracion: {paquete.Duracion}|  Precio: {paquete.Precio}  | Disponible:{disponibilidadStr} | Tipo de viaje:  {paquete.TipoViaje} |");
             }
+            Console.ReadKey();
         }
 
         public static void VerPaqueteBuscando()
         {
             var context = new DataContext();
             var paquete = BuscarPaquete();
-            verPaqueteEnPantalla(new List<PaqueteTuristico> { paquete });
+            verPaqueteEnPantalla( new List<PaqueteTuristico> { paquete} );
         }
         public static void VerPaqueteBuscando(int optionSearch, string searchTerm)
         {
@@ -116,10 +118,8 @@ namespace turipaq.Logic.LogicAdmin
         {
             var context = new DataContext();
             paquetes = context.Paquete_Turisticos.ToList();
-
             verPaqueteEnPantalla(paquetes);
         }
-
         public static void EditarPaquetes()
         {
 
@@ -131,21 +131,21 @@ namespace turipaq.Logic.LogicAdmin
             var Destino = Console.ReadLine();
             Console.Write($"la duracion del paquete es: {paquete.Duracion}, Digite la nueva duracion ");
             var Duracion = Console.ReadLine();
-            Console.Write($"El precio del paquete es: {paquete.precio}, Digite el Nuevo Precio: ");
+            Console.Write($"El precio del paquete es: {paquete.Precio}, Digite el Nuevo Precio: ");
             var precio = Convert.ToInt32(Console.ReadLine());
             Console.Write($"El Tipo de viaje es: {paquete.TipoViaje}, Digite un Nuevo tipo de viaje: ");
             var TipoViaje = Console.ReadLine();
-            Console.Write($"el paquete : {paquete.disponibilidad}, ingrese  1 esta disponible o 2. no esta disponible: ");
+            Console.Write($"el paquete : {paquete.Disponibilidad}, ingrese  1 esta disponible o 2. no esta disponible: ");
             bool disponibilidad;
             var disponibilidadstr = (disponibilidad = true) ? "si" : "no";
 
 
-
+            
             paquete.Destino = Destino;
             paquete.Duracion = Duracion;
-            paquete.precio = precio;
+            paquete.Precio = precio;
             paquete.TipoViaje = TipoViaje;
-            paquete.disponibilidad = disponibilidad;
+            paquete.Disponibilidad = disponibilidad;
 
             if (paquete != null)
             {
@@ -158,8 +158,10 @@ namespace turipaq.Logic.LogicAdmin
             }
         }
 
-        public static void EliminarPaquete(List<PaqueteTuristico> paquetes)
+        public static void EliminarPaquete()
         {
+            var context = new DataContext();
+            var paquetes = context.Paquete_Turisticos.ToList();
             Console.WriteLine("Digite un Id de paquete Para Eliminar");
             int selectedId = Convert.ToInt32(Console.ReadLine());
 
@@ -168,7 +170,6 @@ namespace turipaq.Logic.LogicAdmin
             int opcion = Convert.ToInt32(Console.ReadLine());
             if (opcion == 1)
             {
-                var context = new DataContext();
                 context.Paquete_Turisticos.Remove(paquete);
                 context.SaveChanges();
 

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using Microsoft.EntityFrameworkCore;
-using turipaq.Logic;
-using turipaq.entities_model;
-namespace turipaq.AI
+﻿using turipaq.entities_model;
+using turipaq.Logic.LogicAdmin;
+namespace turipaq.Interfaces.AI
 {
     class PaqueteAi
     {
@@ -66,7 +62,7 @@ namespace turipaq.AI
 
                     case "5":
                         Console.Clear();
-                        PaqueteBL.EliminarPaquete(paquetes);
+                        PaqueteBL.EliminarPaquete();
                         break;
 
                     case "6":

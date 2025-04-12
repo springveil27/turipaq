@@ -34,7 +34,7 @@ namespace turipaq.Interfaces.AI
 
                     case "2":
                         Console.Clear();
-                        ClienteBL.VerClientes(clientes);
+                        ClienteBL.VerClientes();
                         break;
 
                     case "3":
@@ -51,7 +51,7 @@ namespace turipaq.Interfaces.AI
                             Console.WriteLine("Ingrese la opcion a utilizar");
                             var filter = Console.ReadLine();
 
-                            ClienteBL.VerClienteBuscado(OptionSearch, filter);
+                            ClienteBL.VerClienteBuscado();
                         }
 
                         break;
@@ -63,7 +63,7 @@ namespace turipaq.Interfaces.AI
 
                     case "5":
                         Console.Clear();
-                       ClienteBL.EliminarCliente(clientes);
+                       ClienteBL.EliminarCliente();
                         break;
 
                     case "6":

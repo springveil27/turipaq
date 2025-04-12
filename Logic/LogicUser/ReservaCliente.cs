@@ -1,39 +1,49 @@
 ﻿using turipaq.Database;
 using turipaq.entities_model;
+using turipaq.Interfaces.AI;
+using turipaq.Logic.LogicAdmin;
+using turipaq.Login;
 
-
-namespace turipaq.Logic.LogicAdmin
+namespace turipaq.Logic.LogicUser
 {
-
-    public class ReservaBL
+    public class ReservaCliente
     {
-        public static int GeneradorID(int count) => count++;
         public static string GenerarCodigoUnico()
         {
             string guid = Guid.NewGuid().ToString("N");
             return guid.Substring(0, 10).ToUpper();
         }
-
-        public static void AgregarReserva(List<Reserva> reservas)
+        public static void CrearReserva(List<Reserva> reservas, List<PaqueteTuristico> paquetes)
         {
-            DateTime fechaReserva = DateTime.Now;
 
-            Console.WriteLine("===== Hacer Reserva  ====="); ;
-            var idReserva = GeneradorID(reservas.Count());
+            Console.WriteLine("===== Hacer Reserva  =====");
+            var context = new DataContext();
+            DateTime fechaReserva = DateTime.Now;
+            PaqueteBL.verPaquetes(paquetes);
+
+            var cliente = context.Clientes.FirstOrDefault(c => c.ClienteId == LogicLogin.UsuarioIniciado.ClienteId);
+
             Console.Write("Ingrese el ID del paquete que desea reservar ");
             var idPaquete = Convert.ToInt32(Console.ReadLine());
-            Console.Write("Usuario que desea Reservar ");
-            var idUsuario = Convert.ToInt32(Console.ReadLine());
+            var paquete = context.Paquete_Turisticos.FirstOrDefault(p => p.PaqueteId == idPaquete);
+            var idUsuario = LogicLogin.UsuarioIniciado.ClienteId;
             Console.Write("en que fecha desea viajar (dd/MM/yyyy): ");
             var fechaViaje = Console.ReadLine();
+
             var CodigoUnico = GenerarCodigoUnico();
             var fecha = fechaReserva.ToString();
             Console.WriteLine("======================================");
             Console.WriteLine();
 
+            paquete.ReservasActuales++;
+            if (paquete.ReservasActuales >= 3)
+            {
+                paquete.Disponibilidad = false;
+                Console.WriteLine("Este fue el último cupo. El paquete ya no estará disponible.");
+            }
+
             var Reserva = new Reserva()
             {
-                ReservaId = idReserva,
                 PaqueteId = idPaquete,
                 ClienteId = idUsuario,
                 FechaReserva = fecha,
@@ -41,73 +51,44 @@ namespace turipaq.Logic.LogicAdmin
                 CódigoConfirmación = CodigoUnico
 
             };
-            var context = new DataContext();
+
             context.Reservas.Add(Reserva);
             context.SaveChanges();
-        }
+            Console.WriteLine("Reserva realizada con correctamente");
 
-        public static void VerReservaEnPantalla(List<Reserva> reservas)
+            List<Pago> pagos = new List<Pago>();
+            List<PaqueteTuristico> monto = new List<PaqueteTuristico>();
+            PagoBL.Pagar(pagos, Reserva.ReservaId);
+        }
+        public static void VerMiReserva(List<Reserva> reservas)
         {
+            var context = new DataContext();
             foreach (var reserva in reservas)
             {
-                Console.WriteLine($"|ID: {reserva.ReservaId}|Nombre: {reserva.PaqueteId} | Apellido: {reserva.ClienteId} |Correo: {reserva.FechaReserva}|  telefono: {reserva.FechaViaje}  | cedula: {reserva.CódigoConfirmación} |");
+            var paquete = context.Paquete_Turisticos.Find(reserva.PaqueteId);
+                
+
+                Console.WriteLine($"|Lugar de viaje: {paquete.Destino} |ID: {reserva.ReservaId}|ID reserva: {reserva.PaqueteId} | Cliente ID: {reserva.ClienteId} |Fecha de reserva{reserva.FechaReserva}|  fecha de viaje {reserva.FechaViaje}  |codigo de confirmacion {reserva.CódigoConfirmación} |");
             }
             Console.ReadKey();
         }
 
-        public static void VerReservaBuscada()
+        public static void VerReservaBuscada(List<Reserva> reservas)
         {
             var context = new DataContext();
             var reserva = BuscarReserva();
-            VerReservaEnPantalla(new List<Reserva> { reserva });
-        }
-
-        public static void VerReservaBuscada(int optionSearch)
-        {
-            var reservas = BuscarReserva(optionSearch);
-            VerReservaEnPantalla(reservas);
+            VerMiReserva(reservas);
         }
 
         public static Reserva BuscarReserva()
         {
             var context = new DataContext();
-            Console.WriteLine("Digite un Id de Reserva Para Mostrar");
-            int idSeleccionado = Convert.ToInt32(Console.ReadLine());
-
-            var reserva = context.Reservas.FirstOrDefault(p => p.ReservaId == idSeleccionado);
+            int idSeleccionado = LogicLogin.UsuarioIniciado.ClienteId;
+            var reserva = context.Reservas.FirstOrDefault(p => p.ClienteId == idSeleccionado);
 
             return reserva;
         }
 
-        public static List<Reserva> BuscarReserva(int optionSearch)
-        {
-            var context = new DataContext();
-            List<Reserva> reservasSeleccionadas = new List<Reserva>();
-
-            Console.WriteLine("Digite el ID a buscar:");
-            int idSeleccionado = Convert.ToInt32(Console.ReadLine());
-
-            switch (optionSearch)
-            {
-                case 2:
-                    reservasSeleccionadas = context.Reservas
-                        .Where(p => p.PaqueteId == idSeleccionado)
-                        .ToList();
-                    break;
-
-                case 3:
-                    reservasSeleccionadas = context.Reservas
-                        .Where(p => p.ClienteId == idSeleccionado)
-                        .ToList();
-                    break;
-
-                default:
-                    Console.WriteLine("Opción no válida.");
-                    break;
-            }
-
-            return reservasSeleccionadas;
-        }
 
 
         public static void VerReservas(List<Reserva> reservas)
@@ -115,7 +96,7 @@ namespace turipaq.Logic.LogicAdmin
             var context = new DataContext();
             reservas = context.Reservas.ToList();
 
-            VerReservaEnPantalla(reservas);
+            VerMiReserva(reservas);
         }
 
         public static void EditarReserva()
@@ -159,19 +140,19 @@ namespace turipaq.Logic.LogicAdmin
             }
         }
 
-        public static void EliminarReserva(List<Reserva> reservas)
+        public static void EliminarReserva()
         {
             Console.WriteLine("Digite un Id de Reserva Para Eliminar");
             int selectedId = Convert.ToInt32(Console.ReadLine());
             var context = new DataContext();
-            var reserva = context.Reservas.Where(p => p.ReservaId == selectedId).FirstOrDefault();
+            var reservas = context.Reservas.Where(p => p.ReservaId == selectedId).FirstOrDefault();
 
             Console.WriteLine("¿Seguro que desea eliminar? 1. Sí, 2. No");
             int opcion = Convert.ToInt32(Console.ReadLine());
 
             if (opcion == 1)
             {
-                context.Reservas.Remove(reserva);
+                context.Reservas.Remove(reservas);
                 context.SaveChanges();
                 Console.WriteLine("Reserva eliminada correctamente");
             }
@@ -182,3 +163,4 @@ namespace turipaq.Logic.LogicAdmin
         }
     }
 }
+

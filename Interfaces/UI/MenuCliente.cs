@@ -2,17 +2,21 @@
 using turipaq.Login;
 using Microsoft.EntityFrameworkCore;
 using turipaq.entities_model;
-using turipaq.Logic;
+using turipaq.Logic.LogicUser;
+using turipaq.Logic.LogicAdmin;
 using turipaq.Database;
 
-namespace turipaq.UI
+namespace turipaq.Interfaces.UI
 {
     public class ClienteUi
     {
      
             public static void MenuCliente()
         {
-            List<Cliente> clientes = new List<Cliente>();
+
+            var context = new DataContext();
+          List<Reserva> reservas = context.Reservas.ToList();
+            List < PaqueteTuristico > paquetes = new List<PaqueteTuristico>();
 
             bool back = false;
             while (!back)
@@ -23,25 +27,36 @@ namespace turipaq.UI
                 Console.WriteLine("2. Editar mi perfil");
                 Console.WriteLine("3. Hacer una reserva");
                 Console.WriteLine("4. Ver mis reservas");
-                Console.WriteLine("5. Cerrar sesión");
+                Console.WriteLine("4. ver mi pagos");
+                Console.WriteLine("6. Cerrar sesión");
                 Console.WriteLine("======================================");
                 Console.Write("Seleccione una opción: ");
-                string option = Console.ReadLine();
+                int option = Convert.ToInt32(Console.ReadLine());
                 var usuarioActual = LogicLogin.UsuarioIniciado;
                
                 switch (option)
                 {
-                    case "1":
+                    case 1:
                         Console.Clear();
                         VistaCliente.VerClienteBuscado();
                         break;
 
-                    case "2":
+                    case 2:
                         Console.Clear();
                          VistaCliente.EditarCliente();
                         break;
 
-                    case "3":
+                    case 3:
+                        Console.Clear();
+                        ReservaCliente.CrearReserva(reservas,paquetes);
+                        break; 
+                    case 4:
+                        ReservaCliente.VerMiReserva(reservas);
+                        break;
+                    case 5:
+                        PagoBL.VerPagos();
+                        break;
+                    case 6:
                         back = true;
                         break;
                     default:

@@ -1,75 +1,62 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Transactions;
 using turipaq.Database;
 using turipaq.entities_model;
-using System.Runtime.CompilerServices;
 
 namespace turipaq.Logic.LogicAdmin
 {
     public class PagoBL
     {
-        public static int GeneradorID(int count) => count++;
-
-        public static void AgregarPago(List<Pago> pagos)
+        public static void Pagar(List<Pago>pagos, int reservaId)
         {
+            var context = new DataContext();
+            var reserva = context.Reservas.Find(reservaId);
+            var monto = context.Paquete_Turisticos.Find(reserva.PaqueteId);
+           
+           
             Console.WriteLine("===== REGISTRAR PAGO =====");
-            var pagoiD = GeneradorID(pagos.Count());
             Console.Write("Metodo de pago 1.Tarjeta 2.Efectivo 3.Transferencia: ");
             var metodoPago = Convert.ToInt32(Console.ReadLine());
-            Console.Write("ingresa el id de la reserva que pago ");
-            var ReservaId = Convert.ToInt32(Console.ReadLine());
-            Console.Write("Monto de pago: $RD ");
-            int monto = int.Parse(Console.ReadLine());
-            DateTime fechapago = DateTime.Now;
-
-            while (metodoPago != 1 || metodoPago != 2 || metodoPago != 3)
+           
+           DateTime fechapago = DateTime.Now;
+       
+            do
             {
                 if (metodoPago == 1)
                 {
-                    var metodoPagoStr = "Tarjeta";
                     var pago = new Pago()
                     {
-                        PagoId = pagoiD,
-                        MetodoPago = metodoPagoStr,
-                        ReservaID = ReservaId,
-                        Monto = new PaqueteTuristico().precio,
-                        FechaPago = fechapago.ToString()
-
+                        MetodoPago = "Tarjeta",
+                        Monto = monto.Precio,
+                        FechaPago = fechapago,
+                        ReservaId = reservaId
                     };
-                    var context = new DataContext();
                     context.Pagos.Add(pago);
                     context.SaveChanges();
                 }
                 else if (metodoPago == 2)
                 {
-                    var metodoPagoStr = "Efectivo";
                     var pago = new Pago()
                     {
-                        PagoId = pagoiD,
-                        MetodoPago = metodoPagoStr,
-                        ReservaID = ReservaId,
-                        Monto = new PaqueteTuristico().precio,
-                        FechaPago = fechapago.ToString()
+                        MetodoPago = "Efectivo",
+                        Monto = monto.Precio,
+                        FechaPago = fechapago,
+                        ReservaId = reservaId
+
                     };
-                    var context = new DataContext();
                     context.Pagos.Add(pago);
                     context.SaveChanges();
+
                 }
                 else if (metodoPago == 3)
                 {
-                    var metodoPagoStr = "Transferencia";
                     var pago = new Pago()
                     {
-                        PagoId = pagoiD,
-                        MetodoPago = metodoPagoStr,
-                        ReservaID = ReservaId,
-                        Monto = new PaqueteTuristico().precio,
-                        FechaPago = fechapago.ToString()
+                        MetodoPago = "Transferencia",
+                        Monto = monto.Precio,
+                        FechaPago = fechapago,
+                        ReservaId = reservaId
                     };
-                    var context = new DataContext();
+
                     context.Pagos.Add(pago);
                     context.SaveChanges();
                 }
@@ -77,15 +64,19 @@ namespace turipaq.Logic.LogicAdmin
                 {
                     Console.WriteLine("Selecciona una opcion valida");
                 }
-            }
 
+                Console.WriteLine("pago realizado con exitosamente");
+            } while (metodoPago != 1 && metodoPago != 2 && metodoPago != 3);
         }
 
-        public static void VerPagoEnPantalla(List<Pago> pagos)
+        public static void VerPagoEnPantalla()
         {
+            var context = new DataContext();
+            var pagos = context.Pagos.ToList();
+
             foreach (var pago in pagos)
             {
-                Console.WriteLine($"|ID: {pago.PagoId} | ID de reserva: {pago.ReservaID} | monto a pagado: {pago.Monto} | metodo: {pago.MetodoPago} | fecha de pago: {pago.FechaPago}|");
+                Console.WriteLine($"|ID: {pago.PagoId} | ID de reserva: {pago.ReservaId} | monto a pagado: {pago.Monto} | metodo: {pago.MetodoPago} | fecha de pago: {pago.FechaPago}|");
             }
         }
 
@@ -93,13 +84,13 @@ namespace turipaq.Logic.LogicAdmin
         {
             var context = new DataContext();
             var pago = BuscarPago();
-            VerPagoEnPantalla(new List<Pago> { pago });
+            VerPagoEnPantalla();
         }
 
         public static void VerPagoBuscado(int optionSearch, string searchTerm)
         {
             var pagos = BuscarPago(optionSearch, searchTerm);
-            VerPagoEnPantalla(pagos);
+            VerPagoEnPantalla();
         }
 
         public static Pago BuscarPago()
@@ -125,7 +116,7 @@ namespace turipaq.Logic.LogicAdmin
                         .ToList();
                     break;
                 case 3:
-                    pagosSeleccionados = context.Pagos.Where(p => p.FechaPago.ToLower().Contains(searchTerm.ToLower()))
+                    pagosSeleccionados = context.Pagos.Where(p => p.FechaPago.ToString().ToLower().Contains(searchTerm.ToLower()))
                         .ToList();
                     break;
                 default:
@@ -136,17 +127,19 @@ namespace turipaq.Logic.LogicAdmin
             return pagosSeleccionados;
         }
 
-        public static void VerPagos(List<Pago> pagos)
+        public static void VerPagos()
         {
             var context = new DataContext();
-            pagos = context.Pagos.ToList();
-            VerPagoEnPantalla(pagos);
+            var pagos = context.Pagos.ToList();
+            VerPagoEnPantalla();
         }
 
-     
 
-        public static void EliminarPago(List<Pago> pagos)
+
+        public static void EliminarPago()
         {
+            var context = new DataContext();
+            var pagos = context.Pagos.ToList();
             Console.WriteLine("Digite un ID de pago para eliminar:");
             int selectedId = Convert.ToInt32(Console.ReadLine());
 
@@ -156,7 +149,6 @@ namespace turipaq.Logic.LogicAdmin
 
             if (opcion == 1)
             {
-                var context = new DataContext();
                 context.Pagos.Remove(pago);
                 context.SaveChanges();
                 Console.WriteLine("Pago eliminado correctamente.");

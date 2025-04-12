@@ -28,12 +28,14 @@ namespace turipaq.Interfaces.AI
                 {
                     case "1":
                         Console.Clear();
-                        PagoBL.AgregarPago(pagos);
+                        Console.WriteLine("Ingresa el id de la reserva que desea pagar");
+                        int reservaId = Convert.ToInt32(Console.ReadLine());
+                        PagoBL.Pagar(pagos, reservaId);
                         break;
 
                     case "2":
                         Console.Clear();
-                        PagoBL.VerPagos(pagos);
+                        PagoBL.VerPagos();
                         break;
 
                     case "3":
@@ -54,7 +56,7 @@ namespace turipaq.Interfaces.AI
                         break;
                     case "4":
                         Console.Clear();
-                        PagoBL.EliminarPago(pagos);
+                        PagoBL.EliminarPago();
                         break;
 
                     case "5":

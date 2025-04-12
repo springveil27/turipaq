@@ -1,9 +1,9 @@
 ﻿using System;
-using turipaq.Logic;
 using turipaq.Login;
 using turipaq.entities_model;
 using Microsoft.EntityFrameworkCore;
 using turipaq.entities_model;
+using turipaq.Logic.LogicUser;
 
 bool running = true;
 while (running)
