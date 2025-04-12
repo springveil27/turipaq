@@ -16,5 +16,9 @@ namespace turipaq.entities_model
         public string? Correo { get; set; }
         public string? Telefono { get; set; }
         public string? DocumentoIdentidad { get; set; }
+
+        public string? Usuario { get; set; }
+        public string Contrasena { get; set; }
+        public bool? Admin {  get; set; }
     }
 }

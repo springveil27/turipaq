@@ -8,7 +8,7 @@ using turipaq.entities_model;
 using System.Runtime.CompilerServices;
 using Microsoft.IdentityModel.Tokens;
 
-namespace turipaq.Logic
+namespace turipaq.Logic.LogicAdmin
 {
 
     public class ReservaBL

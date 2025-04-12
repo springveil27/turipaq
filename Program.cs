@@ -1,51 +1,36 @@
 ﻿using System;
-using turipaq.AI;
+using turipaq.Logic;
+using turipaq.Login;
+using turipaq.entities_model;
 using Microsoft.EntityFrameworkCore;
+using turipaq.entities_model;
 
-class Database
+bool running = true;
+while (running)
 {
-    static void Main(string[] args)
+    Console.Clear();
+    List<Cliente> clientes = new List<Cliente>();
+    Console.WriteLine("===== TURIPAQ =====");
+    Console.WriteLine(@"1. Iniciar sesion
+2. Crear Cuenta 
+3. Cerrar Aplicacion");
+    Console.WriteLine("======================================");
+    Console.Write("Seleccione una opción: ");
+
+    int opcion = Convert.ToInt32(Console.ReadLine());
+    switch (opcion)
     {
-  
-        bool running = true;
-        while (running)
-        {
+        case 1:
             Console.Clear();
+            LoginInterfaz.iniciarSesion();
+            break;
+        case 2:
+            VistaCliente.CrearCuenta(clientes);
+            break;
 
-            Console.WriteLine("===== MENÚ PRINCIPAL - TURIPAQ  =====");
-            Console.WriteLine("1. Gestionar Paquetes Turísticos");
-            Console.WriteLine("2. Gestionar Reservas");
-            Console.WriteLine("3. Gestionar Clientes");
-            Console.WriteLine("4. Procesar Pagos");
-            Console.WriteLine("5. Volver al menu principal");
-            Console.WriteLine("======================================");
-            Console.Write("Seleccione una opción: ");
-            int seleccion = Convert.ToInt32(Console.ReadLine());
-
-            switch (seleccion)
-            {
-                case 1:
-                    PaqueteAi.Menupaq();
-                    break;
-                case 2:
-                    ReservaAi.MenuReserva();
-                    break;
-                case 3:
-                    ClienteAi.MenuCliente();
-                    break;
-                case 4:
-                    PagoAi.MenuPago();
-                    break;
-                case 6:
-                    running = false;
-                    break;
-                default:
-                    Console.WriteLine("Opción no válida.");
-                    Console.ReadKey();
-                    break;
-            }
-        }
+        case 3:
+            running = false;
+            break;
     }
+
 }
-
-

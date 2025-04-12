@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using turipaq.entities_model;
-using turipaq.Logic;
-namespace turipaq.AI
+﻿using turipaq.entities_model;
+using turipaq.Logic.LogicAdmin;
+
+namespace turipaq.Interfaces.AI
 {
     public class ClienteAi
     {
@@ -18,7 +13,7 @@ namespace turipaq.AI
             while (!back)
             {
                 Console.Clear();
-                Console.WriteLine("===== MENÚ DE Clientes =====");
+                Console.WriteLine("===== GESTION DE CLIENTES =====");
                 Console.WriteLine("1.Agregar un nuevo Cliente");
                 Console.WriteLine("2. Ver todos los clientes ");
                 Console.WriteLine("3. Buscar clientes");

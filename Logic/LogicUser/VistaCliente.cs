@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 using turipaq.Database;
 using turipaq.entities_model;
 using System.Runtime.CompilerServices;
+using turipaq.Login;
 
 namespace turipaq.Logic
 {
-    public class ClienteBL
+    public class VistaCliente
     {
         public static int GeneradorID(int count) => count++;
 
-        public static void AgregarCliente(List<Cliente> clientes)
+        public static void CrearCuenta(List<Cliente> clientes)
         {
-            //TODO:AGregar usuario y contraseña.
             Console.WriteLine("===== CREAR USUARIO  ====="); ;
             var id = GeneradorID(clientes.Count());
             Console.Write("Ingrese su nombre ");
@@ -28,6 +28,11 @@ namespace turipaq.Logic
             var telefono = Console.ReadLine();
             Console.Write("Ingresa tu documento de identidad");
             var documentoIdentad = Console.ReadLine();
+            Console.Write("Ingresa un Usuario");
+            var usuario = Console.ReadLine();
+            Console.Write("Ingresa una contraseña");
+            var contrasena = Console.ReadLine();
+            bool esAdmin = Convert.ToInt32(Console.ReadLine()) == 0;
             Console.WriteLine("======================================");
             Console.WriteLine();
 
@@ -38,7 +43,10 @@ namespace turipaq.Logic
                 Apellido = apellido,
                 Correo = correo,
                 Telefono = telefono,
-                DocumentoIdentidad = documentoIdentad
+                DocumentoIdentidad = documentoIdentad,
+                Usuario = usuario,
+                Contrasena = contrasena,
+                Admin = esAdmin
             };
             var context = new DataContext();
             context.Clientes.Add(Cliente);
@@ -48,11 +56,9 @@ namespace turipaq.Logic
 
         public static void VerClienteEnPantalla(List<Cliente> cliente)
         {
-
-
             foreach (var clientes in cliente)
             {
-                Console.WriteLine($"|ID: {clientes.ClienteId }|Nombre: {clientes.Nombre} | Apellido: {clientes.Apellido} |Correo: {clientes.Correo}|  telefono: {clientes.Telefono}  | cedula: {clientes.DocumentoIdentidad} | Tipo de viaje: {clientes} |");
+                Console.WriteLine($"|ID: {clientes.ClienteId}|Nombre: {clientes.Nombre} | Apellido: {clientes.Apellido} |Correo: {clientes.Correo}|  telefono: {clientes.Telefono}  | cedula: {clientes.DocumentoIdentidad} | Usuario: {clientes.Usuario} |");
             }
             Console.ReadKey();
         }
@@ -63,55 +69,15 @@ namespace turipaq.Logic
             var cliente = BuscarCliente();
             VerClienteEnPantalla(new List<Cliente> { cliente });
         }
-        public static void VerClienteBuscado(int optionSearch, string searchTerm)
-        {
-            var cliente = BuscarCliente(optionSearch, searchTerm);
-            VerClienteEnPantalla(cliente);
-        }
         public static Cliente BuscarCliente()
         {
+            var usuarioActual = LogicLogin.UsuarioIniciado.ClienteId;
             var context = new DataContext();
             Console.WriteLine("Digite un Id de Paquete Para Mostrar");
-            int selectedId = Convert.ToInt32(Console.ReadLine());
-
+            int selectedId = usuarioActual;
             var cliente = context.Clientes.FirstOrDefault(p => p.ClienteId == selectedId);
 
             return cliente;
-        }
-        public static List<Cliente> BuscarCliente(int optionSearch, string searchTerm)
-        {
-            var context = new DataContext();
-            {
-                List<Cliente> ClienteSeleccionado = new List<Cliente>();
-                switch (optionSearch)
-                {
-                    case 2:
-
-                        ClienteSeleccionado = context.Clientes
-                            .Where(p => p.Nombre.ToLower().Contains(searchTerm.ToLower())|| p.Apellido.Contains(searchTerm.ToLower()))
-                            .ToList();
-                        break;
-
-                    case 3:
-                        ClienteSeleccionado = context.Clientes
-                            .Where(p => p.Telefono.ToLower().Contains(searchTerm.ToLower()))
-                            .ToList();
-                        break;
-
-                    case 4:
-                        //TODO: AGREGAR busqueda por usuario
-                        ClienteSeleccionado = context.Clientes
-                            .Where(p => p.DocumentoIdentidad.ToLower().Contains(searchTerm.ToLower()))
-                                .ToList();
-                        break;
-
-                    default:
-                        Console.WriteLine("Opción no válida.");
-                        break;
-                }
-
-                return ClienteSeleccionado;
-            }
         }
         public static void VerClientes(List<Cliente> clientes)
         {
@@ -136,9 +102,21 @@ namespace turipaq.Logic
             var correo = Console.ReadLine();
             Console.Write($"El Telefono es: {cliente.Telefono}, Ingrese el nuevo numero: ");
             var telefono = Console.ReadLine();
-        //TODO: AGREGAR CONTRASE
             Console.Write($"el documento  : {cliente.DocumentoIdentidad}, ingresa el nuevo e: ");
             var documentoIdentidad = Console.ReadLine();
+            Console.Write($"Desea editar la contraseña? 1.Si 2.No ");
+            int selectOption = Convert.ToInt32(Console.ReadLine());
+            if (selectOption == 1)
+            {
+                Console.Write($"Ingresa la contraseña actual: ");
+                var contrasenaActual = Console.ReadLine();
+                if (contrasenaActual == cliente.Contrasena)
+                {
+                    Console.WriteLine("Ingresa una nueva contraseña");
+                    var contrasena = Console.ReadLine();
+                    cliente.Contrasena = contrasena;
+                }
+            }
 
             cliente.Nombre = nombre;
             cliente.Apellido = apellido;
@@ -167,7 +145,7 @@ namespace turipaq.Logic
             int opcion = Convert.ToInt32(Console.ReadLine());
             if (opcion == 1)
             {
-               
+
                 context.Clientes.Remove(cliente);
                 context.SaveChanges();
 
@@ -179,3 +157,4 @@ namespace turipaq.Logic
 
     }
 }
+

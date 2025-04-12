@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using turipaq.entities_model;
-using turipaq.Logic;
+﻿using turipaq.entities_model;
+using turipaq.Logic.LogicAdmin;
 
-namespace turipaq.AI
+namespace turipaq.Interfaces.AI
 {
     public class ReservaAi
     {

@@ -7,7 +7,7 @@ using turipaq.Database;
 using turipaq.entities_model;
 using System.Runtime.CompilerServices;
 
-namespace turipaq.Logic
+namespace turipaq.Logic.LogicAdmin
 {
     public class PaqueteBL
     {
