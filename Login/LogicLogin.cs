@@ -14,12 +14,15 @@ namespace turipaq.Login
                 UsuarioIniciado = cliente;
                 return true;
                 }
+            {
+                return false;
+            }
             return false;
         }
 
         public static void Logout() => UsuarioIniciado = null;
-        
-        public static bool EsAdmin() =>  UsuarioIniciado != null && UsuarioIniciado.Admin;
+
+        public static bool EsAdmin() => UsuarioIniciado != null && UsuarioIniciado.Admin;
         
     }
 }

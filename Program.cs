@@ -25,6 +25,7 @@ while (running)
             LoginInterfaz.iniciarSesion();
             break;
         case 2:
+            Console.Clear();
             VistaCliente.CrearCuenta(clientes);
             break;
 
@@ -32,5 +33,8 @@ while (running)
             running = false;
             break;
     }
-
+    if (opcion < 1 && opcion > 3)
+    {
+        Console.WriteLine("Ingrese una opcion valida");
+    }
 }
