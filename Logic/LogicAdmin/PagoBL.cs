@@ -8,65 +8,85 @@ namespace turipaq.Logic.LogicAdmin
     {
         public static void Pagar(List<Pago>pagos, int reservaId)
         {
-            var context = new DataContext();
-            var reserva = context.Reservas.Find(reservaId);
-            var monto = context.Paquete_Turisticos.Find(reserva.PaqueteId);
-           
-           
-            Console.WriteLine("===== REGISTRAR PAGO =====");
-            Console.Write("Metodo de pago 1.Tarjeta 2.Efectivo 3.Transferencia: ");
-            var metodoPago = Convert.ToInt32(Console.ReadLine());
-           
-           DateTime fechapago = DateTime.Now;
-       
-            do
+            try
             {
-                if (metodoPago == 1)
+                using (var context = new DataContext())
                 {
-                    var pago = new Pago()
+                    var reserva = context.Reservas.Find(reservaId);
+                    if (reserva == null)
                     {
-                        MetodoPago = "Tarjeta",
-                        Monto = monto.Precio,
-                        FechaPago = fechapago,
-                        ReservaId = reservaId
-                    };
-                    context.Pagos.Add(pago);
-                    context.SaveChanges();
-                }
-                else if (metodoPago == 2)
-                {
-                    var pago = new Pago()
+                        Console.WriteLine("Error: No se encontró la reserva especificada.");
+                        return;
+                    }
+
+                    var monto = context.Paquete_Turisticos.Find(reserva.PaqueteId);
+                    if (monto == null)
                     {
-                        MetodoPago = "Efectivo",
-                        Monto = monto.Precio,
-                        FechaPago = fechapago,
-                        ReservaId = reservaId
+                        Console.WriteLine("Error: No se encontró el paquete turístico asociado a la reserva.");
+                        return;
+                    }
 
-                    };
-                    context.Pagos.Add(pago);
-                    context.SaveChanges();
+                    Console.WriteLine("===== REGISTRAR PAGO =====");
+                    Console.Write("Metodo de pago 1.Tarjeta 2.Efectivo 3.Transferencia: ");
+                    var metodoPago = Convert.ToInt32(Console.ReadLine());
 
-                }
-                else if (metodoPago == 3)
-                {
-                    var pago = new Pago()
+                    DateTime fechaPago = DateTime.Now;
+
+                    do
                     {
-                        MetodoPago = "Transferencia",
-                        Monto = monto.Precio,
-                        FechaPago = fechapago,
-                        ReservaId = reservaId
-                    };
+                        Pago pago = null;
+                        if (metodoPago == 1)
+                        {
+                            pago = new Pago()
+                            {
+                                MetodoPago = "Tarjeta",
+                                Monto = monto.Precio,
+                                FechaPago = fechaPago,
+                                ReservaId = reservaId
+                            };
+                        }
+                        else if (metodoPago == 2)
+                        {
+                            pago = new Pago()
+                            {
+                                MetodoPago = "Efectivo",
+                                Monto = monto.Precio,
+                                FechaPago = fechaPago,
+                                ReservaId = reservaId
+                            };
+                        }
+                        else if (metodoPago == 3)
+                        {
+                            pago = new Pago()
+                            {
+                                MetodoPago = "Transferencia",
+                                Monto = monto.Precio,
+                                FechaPago = fechaPago,
+                                ReservaId = reservaId
+                            };
+                        }
+                        else
+                        {
+                            Console.WriteLine("Selecciona una opción válida");
+                            continue;
+                        }
 
-                    context.Pagos.Add(pago);
-                    context.SaveChanges();
-                }
-                else
-                {
-                    Console.WriteLine("Selecciona una opcion valida");
-                }
+                        context.Pagos.Add(pago);
+                        context.SaveChanges();
+                        Console.WriteLine("Pago realizado exitosamente");
+                        break;
 
-                Console.WriteLine("pago realizado con exitosamente");
-            } while (metodoPago != 1 && metodoPago != 2 && metodoPago != 3);
+                    } while (metodoPago != 1 && metodoPago != 2 && metodoPago != 3);
+                }
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Error: El formato de entrada no es válido. Por favor, ingrese un número válido.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al procesar el pago: {ex.Message}");
+            }
         }
 
         public static void VerPagoEnPantalla()
@@ -105,26 +125,48 @@ namespace turipaq.Logic.LogicAdmin
 
         public static List<Pago> BuscarPago(int optionSearch, string searchTerm)
         {
-            var context = new DataContext();
-            List<Pago> pagosSeleccionados = new List<Pago>();
-
-            switch (optionSearch)
+           try
             {
-                case 2:
-                    pagosSeleccionados = context.Pagos
-                        .Where(p => p.MetodoPago.ToLower().Contains(searchTerm.ToLower()))
-                        .ToList();
-                    break;
-                case 3:
-                    pagosSeleccionados = context.Pagos.Where(p => p.FechaPago.ToString().ToLower().Contains(searchTerm.ToLower()))
-                        .ToList();
-                    break;
-                default:
-                    Console.WriteLine("Opción no válida.");
-                    break;
-            }
+                if (string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    Console.WriteLine("Error: El término de búsqueda no puede estar vacío.");
+                    return new List<Pago>();
+                }
 
-            return pagosSeleccionados;
+                using (var context = new DataContext())
+                {
+                    List<Pago> pagosSeleccionados = new List<Pago>();
+
+                    switch (optionSearch)
+                    {
+                        case 2:
+                            pagosSeleccionados = context.Pagos
+                                .Where(p => p.MetodoPago.ToLower().Contains(searchTerm.ToLower()))
+                                .ToList();
+                            break;
+                        case 3:
+                            pagosSeleccionados = context.Pagos
+                                .Where(p => p.FechaPago.ToString().ToLower().Contains(searchTerm.ToLower()))
+                                .ToList();
+                            break;
+                        default:
+                            Console.WriteLine("Opción no válida.");
+                            break;
+                    }
+
+                    if (pagosSeleccionados.Count == 0)
+                    {
+                        Console.WriteLine("No se encontraron pagos con los criterios especificados.");
+                    }
+
+                    return pagosSeleccionados;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al buscar pagos: {ex.Message}");
+                return new List<Pago>();
+            }
         }
 
         public static void VerPagos()
@@ -138,24 +180,43 @@ namespace turipaq.Logic.LogicAdmin
 
         public static void EliminarPago()
         {
-            var context = new DataContext();
-            var pagos = context.Pagos.ToList();
-            Console.WriteLine("Digite un ID de pago para eliminar:");
-            int selectedId = Convert.ToInt32(Console.ReadLine());
-
-            var pago = pagos.FirstOrDefault(p => p.PagoId == selectedId);
-            Console.WriteLine("¿Seguro que desea eliminar? 1. Sí 2. No");
-            int opcion = Convert.ToInt32(Console.ReadLine());
-
-            if (opcion == 1)
+            try
             {
-                context.Pagos.Remove(pago);
-                context.SaveChanges();
-                Console.WriteLine("Pago eliminado correctamente.");
+                using (var context = new DataContext())
+                {
+                    Console.WriteLine("Digite un ID de pago para eliminar:");
+                    int selectedId = Convert.ToInt32(Console.ReadLine());
+
+                    var pago = context.Pagos.FirstOrDefault(p => p.PagoId == selectedId);
+
+                    if (pago == null)
+                    {
+                        Console.WriteLine("No se encontró ningún pago con el ID especificado.");
+                        return;
+                    }
+
+                    Console.WriteLine("¿Seguro que desea eliminar? 1. Sí 2. No");
+                    int opcion = Convert.ToInt32(Console.ReadLine());
+
+                    if (opcion == 1)
+                    {
+                        context.Pagos.Remove(pago);
+                        context.SaveChanges();
+                        Console.WriteLine("Pago eliminado correctamente.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Eliminación cancelada.");
+                    }
+                }
             }
-            else
+            catch (FormatException)
             {
-                Console.WriteLine("Eliminación cancelada.");
+                Console.WriteLine("Error: Debe ingresar un número válido.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al eliminar el pago: {ex.Message}");
             }
         }
     }

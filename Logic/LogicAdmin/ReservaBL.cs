@@ -16,34 +16,57 @@ namespace turipaq.Logic.LogicAdmin
 
         public static void AgregarReserva(List<Reserva> reservas)
         {
-            DateTime fechaReserva = DateTime.Now;
-
-            Console.WriteLine("===== Hacer Reserva  ====="); ;
-            var idReserva = GeneradorID(reservas.Count());
-            Console.Write("Ingrese el ID del paquete que desea reservar ");
-            var idPaquete = Convert.ToInt32(Console.ReadLine());
-            Console.Write("Usuario que desea Reservar ");
-            var idUsuario = Convert.ToInt32(Console.ReadLine());
-            Console.Write("en que fecha desea viajar (dd/MM/yyyy): ");
-            var fechaViaje = Console.ReadLine();
-            var CodigoUnico = GenerarCodigoUnico();
-            var fecha = fechaReserva.ToString();
-            Console.WriteLine("======================================");
-            Console.WriteLine();
-
-            var Reserva = new Reserva()
+            try
             {
-                ReservaId = idReserva,
-                PaqueteId = idPaquete,
-                ClienteId = idUsuario,
-                FechaReserva = fecha,
-                FechaViaje = fechaViaje,
-                CódigoConfirmación = CodigoUnico
+                DateTime fechaReserva = DateTime.Now;
 
-            };
-            var context = new DataContext();
-            context.Reservas.Add(Reserva);
-            context.SaveChanges();
+                Console.WriteLine("===== Hacer Reserva  =====");
+                var idReserva = GeneradorID(reservas.Count());
+
+                Console.Write("Ingrese el ID del paquete que desea reservar: ");
+                var idPaquete = Convert.ToInt32(Console.ReadLine());
+
+                Console.Write("Usuario que desea Reservar: ");
+                var idUsuario = Convert.ToInt32(Console.ReadLine());
+
+                Console.Write("En qué fecha desea viajar (dd/MM/yyyy): ");
+                var fechaViaje = Console.ReadLine();
+
+                var codigoUnico = GenerarCodigoUnico();
+                var fecha = fechaReserva.ToString();
+
+                Console.WriteLine("======================================");
+                Console.WriteLine();
+
+                var reserva = new Reserva()
+                {
+                    ReservaId = idReserva,
+                    PaqueteId = idPaquete,
+                    ClienteId = idUsuario,
+                    FechaReserva = fecha,
+                    FechaViaje = fechaViaje,
+                    CódigoConfirmación = codigoUnico
+                };
+
+                using (var context = new DataContext())
+                {
+                    context.Reservas.Add(reserva);
+                    context.SaveChanges();
+                    Console.WriteLine("Reserva agregada correctamente.");
+                }
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Error: El formato de entrada no es válido. Por favor, ingrese un número entero donde se requiera.");
+            }
+            catch (OverflowException)
+            {
+                Console.WriteLine("Error: El valor ingresado es demasiado grande o pequeño.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al agregar la reserva: {ex.Message}");
+            }
         }
 
         public static void VerReservaEnPantalla(List<Reserva> reservas)
@@ -118,66 +141,46 @@ namespace turipaq.Logic.LogicAdmin
             VerReservaEnPantalla(reservas);
         }
 
-        public static void EditarReserva()
-        {
-            var context = new DataContext();
-            Console.WriteLine("Digite un Id de Reserva Para Editar");
-            int selectedId = Convert.ToInt32(Console.ReadLine());
-
-            var reserva = context.Reservas.Where(p => p.ReservaId == selectedId).FirstOrDefault();
-
-            Console.Write($"El ID Del paquete es : {reserva.PaqueteId}, Selecciona Otro Paquete: ");
-            string paqueteId = Console.ReadLine();
-            Console.Write($"El apellido es: {reserva.FechaReserva}, Digite el nuevo apellido: ");
-            string fechaReserva = Console.ReadLine();
-            Console.Write($"El correo es: {reserva.FechaViaje}, Digite el Nuevo correo: ");
-            string fechaViaje = Console.ReadLine();
-
-            if (!string.IsNullOrEmpty(paqueteId))
-            {
-                int value = Convert.ToInt32(paqueteId);
-                reserva.PaqueteId = value;
-            }
-            if (!string.IsNullOrEmpty(fechaReserva))
-            {
-                reserva.FechaReserva = fechaReserva;
-            }
-            if (!string.IsNullOrEmpty(fechaReserva))
-            {
-                reserva.FechaViaje = fechaViaje;
-
-            }
-
-            if (reserva != null)
-            {
-                context.Reservas.Update(reserva);
-                context.SaveChanges();
-            }
-            else
-            {
-                Console.WriteLine("Reserva no encontrada.");
-            }
-        }
 
         public static void EliminarReserva(List<Reserva> reservas)
         {
-            Console.WriteLine("Digite un Id de Reserva Para Eliminar");
-            int selectedId = Convert.ToInt32(Console.ReadLine());
-            var context = new DataContext();
-            var reserva = context.Reservas.Where(p => p.ReservaId == selectedId).FirstOrDefault();
-
-            Console.WriteLine("¿Seguro que desea eliminar? 1. Sí, 2. No");
-            int opcion = Convert.ToInt32(Console.ReadLine());
-
-            if (opcion == 1)
+            try
             {
-                context.Reservas.Remove(reserva);
-                context.SaveChanges();
-                Console.WriteLine("Reserva eliminada correctamente");
+                Console.WriteLine("Digite un Id de Reserva Para Eliminar:");
+                int selectedId = Convert.ToInt32(Console.ReadLine());
+
+                using (var context = new DataContext())
+                {
+                    var reserva = context.Reservas.Where(p => p.ReservaId == selectedId).FirstOrDefault();
+
+                    if (reserva == null)
+                    {
+                        Console.WriteLine("No se encontró la reserva con el ID especificado.");
+                        return;
+                    }
+
+                    Console.WriteLine("¿Seguro que desea eliminar? 1. Sí, 2. No");
+                    int opcion = Convert.ToInt32(Console.ReadLine());
+
+                    if (opcion == 1)
+                    {
+                        context.Reservas.Remove(reserva);
+                        context.SaveChanges();
+                        Console.WriteLine("Reserva eliminada correctamente");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Eliminación de reserva cancelada");
+                    }
+                }
             }
-            else
+            catch (FormatException)
             {
-                Console.WriteLine("Eliminación de reserva cancelada");
+                Console.WriteLine("Error: Debe ingresar un número válido.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al eliminar la reserva: {ex.Message}");
             }
         }
     }

@@ -128,33 +128,38 @@ namespace turipaq.Logic.LogicUser
                 Console.WriteLine("Cliente no encontrado.");
             }
         }
-
         public static void VerPagoBuscado()
         {
-            var context = new DataContext();
-            var pago = BuscarPago();
-            VerPagoEnPantalla();
-        }
-        public static Pago BuscarPago()
-        {
-            var context = new DataContext();
-
-            int selectedId =  LogicLogin.UsuarioIniciado.ClienteId;
-
-            var pago = context.Pagos.FirstOrDefault(p => p.PagoId == selectedId);
-            return pago;
-        }
-        public static void VerPagoEnPantalla()
-        {
-            var context = new DataContext();
-            var pagos = context.Pagos.ToList();
-
-            foreach (var pago in pagos)
+            var pagos = BuscarPagosPorCliente();
+            if (pagos != null && pagos.Any())
             {
-                Console.WriteLine($"|ID: {pago.PagoId} | ID de reserva: {pago.ReservaId} | monto a pagado: {pago.Monto} | metodo: {pago.MetodoPago} | fecha de pago: {pago.FechaPago}|");
+                MostrarPagosPorCliente(pagos);
+            }
+            else
+            {
+                Console.WriteLine("No se encontraron pagos para el cliente actual.");
             }
         }
 
+        public static List<Pago> BuscarPagosPorCliente()
+        {
+            var context = new DataContext();
+            int clienteId = LogicLogin.UsuarioIniciado.ClienteId;
+            var reservasDelCliente = context.Reservas.Where(r => r.ClienteId == clienteId).Select(r => r.ReservaId).ToList();
+            var pagos = context.Pagos.Where(p => reservasDelCliente.Contains(p.ReservaId)).ToList();
+
+            return pagos;
+        }
+
+
+        public static void MostrarPagosPorCliente(List<Pago> pagos)
+        {
+            Console.WriteLine($"Pagos del cliente ID: {LogicLogin.UsuarioIniciado.ClienteId}\n");
+            foreach (var pago in pagos)
+            {
+                Console.WriteLine($"|ID: {pago.PagoId} | ID de reserva: {pago.ReservaId} | monto pagado: {pago.Monto} | metodo: {pago.MetodoPago} | fecha de pago: {pago.FechaPago}|");
+            }
+        }
 
     }
 }

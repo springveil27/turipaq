@@ -1,5 +1,6 @@
 ﻿using turipaq.Database;
 using turipaq.entities_model;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace turipaq.Logic.LogicAdmin
@@ -11,33 +12,44 @@ namespace turipaq.Logic.LogicAdmin
 
         public static void AgregarPaquete(List<PaqueteTuristico>paquetes)
         {
-            var context = new DataContext();
-            Console.WriteLine("===== CREAR PAQUETES TURÍSTICOS ====="); ;
-            var id = GeneradorID(paquetes.Count());
-            Console.Write("Destino de viaje ");
-            var destino = Console.ReadLine();
-            Console.Write("Duracion del viaje: ");
-            var duracion = Console.ReadLine();
-            Console.Write("Precio $: ");
-            int precio = Convert.ToInt32(Console.ReadLine());
-            Console.Write("Tipo De viaje: ");
-            var tipoViaje = Console.ReadLine();
-            Console.Write("Disponible 1. Si  2.No: ");
-            bool disponible = Convert.ToInt32(Console.ReadLine()) == 2;
-            Console.WriteLine();
-
-            
-            var paqueteTuristico = new PaqueteTuristico()
+            try
             {
-                PaqueteId = id,
-                Destino = destino,
-                Duracion = duracion,
-                Precio = precio,
-                TipoViaje = tipoViaje,
-                Disponibilidad = disponible
-            };
-            context.Paquete_Turisticos.Add(paqueteTuristico);
-            context.SaveChanges();
+                var context = new DataContext();
+                Console.WriteLine("===== CREAR PAQUETES TURÍSTICOS =====");
+                var id = GeneradorID(paquetes.Count());
+                Console.Write("Destino de viaje ");
+                var destino = Console.ReadLine();
+                Console.Write("Duracion del viaje: ");
+                var duracion = Console.ReadLine();
+                Console.Write("Precio $: ");
+                int precio = Convert.ToInt32(Console.ReadLine());
+                Console.Write("Tipo De viaje: ");
+                var tipoViaje = Console.ReadLine();
+                Console.Write("Disponible 1. Si  2.No: ");
+                bool disponible = Convert.ToInt32(Console.ReadLine()) == 2;
+                Console.WriteLine();
+
+                var paqueteTuristico = new PaqueteTuristico()
+                {
+                    PaqueteId = id,
+                    Destino = destino,
+                    Duracion = duracion,
+                    Precio = precio,
+                    TipoViaje = tipoViaje,
+                    Disponibilidad = disponible
+                };
+                context.Paquete_Turisticos.Add(paqueteTuristico);
+                context.SaveChanges();
+                Console.WriteLine("Paquete turístico agregado correctamente.");
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Error de formato. Asegúrate de ingresar un número válido para el precio.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error inesperado al agregar paquete: {ex.Message}");
+            }
         }
 
        
@@ -123,60 +135,125 @@ namespace turipaq.Logic.LogicAdmin
         public static void EditarPaquetes()
         {
 
-            var context = new DataContext();
-            Console.WriteLine("Digite un  Id del paquete Para Editar");
-            int selectedId = Convert.ToInt32(Console.ReadLine());
-            var paquete = context.Paquete_Turisticos.Where(p => p.PaqueteId == selectedId).FirstOrDefault();
-            Console.Write($"El Destino es: {paquete.Destino}, Digite el Nuevo Destino: ");
-            var Destino = Console.ReadLine();
-            Console.Write($"la duracion del paquete es: {paquete.Duracion}, Digite la nueva duracion ");
-            var Duracion = Console.ReadLine();
-            Console.Write($"El precio del paquete es: {paquete.Precio}, Digite el Nuevo Precio: ");
-            var precio = Convert.ToInt32(Console.ReadLine());
-            Console.Write($"El Tipo de viaje es: {paquete.TipoViaje}, Digite un Nuevo tipo de viaje: ");
-            var TipoViaje = Console.ReadLine();
-            Console.Write($"el paquete : {paquete.Disponibilidad}, ingrese  1 esta disponible o 2. no esta disponible: ");
-            bool disponibilidad;
-            var disponibilidadstr = (disponibilidad = true) ? "si" : "no";
-
-
-            
-            paquete.Destino = Destino;
-            paquete.Duracion = Duracion;
-            paquete.Precio = precio;
-            paquete.TipoViaje = TipoViaje;
-            paquete.Disponibilidad = disponibilidad;
-
-            if (paquete != null)
+            try
             {
+                var context = new DataContext();
+                Console.WriteLine("Digite un Id del paquete Para Editar");
+                int selectedId = Convert.ToInt32(Console.ReadLine());
+                var paquete = context.Paquete_Turisticos.Where(p => p.PaqueteId == selectedId).FirstOrDefault();
+
+                if (paquete == null)
+                {
+                    Console.WriteLine("Paquete no encontrado.");
+                    return;
+                }
+
+                Console.Write($"El Destino es: {paquete.Destino}, Digite el Nuevo Destino (presiona ENTER para omitir): ");
+                var Destino = Console.ReadLine();
+                if (!string.IsNullOrEmpty(Destino) && Destino != " ")
+                {
+                    paquete.Destino = Destino;
+                }
+
+                Console.Write($"la duracion del paquete es: {paquete.Duracion}, Digite la nueva duracion (presiona ENTER para omitir): ");
+                var Duracion = Console.ReadLine();
+                if (!string.IsNullOrEmpty(Duracion) && Duracion != " ")
+                {
+                    paquete.Duracion = Duracion;
+                }
+
+                Console.Write($"El precio del paquete es: {paquete.Precio}, Digite el Nuevo Precio (presiona ENTER para omitir): ");
+                string precioStr = Console.ReadLine();
+                if (!string.IsNullOrEmpty(precioStr) && precioStr != " ")
+                {
+                    try
+                    {
+                        int precio = Convert.ToInt32(precioStr);
+                        paquete.Precio = precio;
+                    }
+                    catch (FormatException)
+                    {
+                        Console.WriteLine("Formato de precio inválido. No se actualizó el precio.");
+                    }
+                }
+
+                Console.Write($"El Tipo de viaje es: {paquete.TipoViaje}, Digite un Nuevo tipo de viaje (presiona ENTER para omitir): ");
+                var TipoViaje = Console.ReadLine();
+                if (!string.IsNullOrEmpty(TipoViaje) && TipoViaje != " ")
+                {
+                    paquete.TipoViaje = TipoViaje;
+                }
+
+                Console.Write($"El paquete está {(paquete.Disponibilidad ? "disponible" : "no disponible")}, ingrese 1. Si está disponible o 2. No está disponible (presiona ENTER para omitir): ");
+                string disponibilidadStr = Console.ReadLine();
+                if (!string.IsNullOrEmpty(disponibilidadStr) && disponibilidadStr != " ")
+                {
+                    try
+                    {
+                        int opcion = Convert.ToInt32(disponibilidadStr);
+                        paquete.Disponibilidad = opcion == 1;
+                    }
+                    catch (FormatException)
+                    {
+                        Console.WriteLine("Formato inválido. No se actualizó la disponibilidad.");
+                    }
+                }
+
                 context.Paquete_Turisticos.Update(paquete);
                 context.SaveChanges();
+                Console.WriteLine("Paquete actualizado correctamente.");
             }
-            else
+            catch (FormatException)
             {
-                Console.WriteLine("Paquete no encontrado.");
+                Console.WriteLine("Error de formato. Asegúrate de ingresar números donde se requiere.");
             }
+            catch (NullReferenceException)
+            {
+                Console.WriteLine("Error: El paquete no existe o los datos son inválidos.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al editar paquete: {ex.Message}");
+            }
+
         }
 
         public static void EliminarPaquete()
         {
-            var context = new DataContext();
-            var paquetes = context.Paquete_Turisticos.ToList();
-            Console.WriteLine("Digite un Id de paquete Para Eliminar");
-            int selectedId = Convert.ToInt32(Console.ReadLine());
-
-            var paquete = paquetes.Where(p => p.PaqueteId == selectedId).FirstOrDefault();
-            Console.WriteLine("Seguro que desea eliminar? 1. Si, 2. No");
-            int opcion = Convert.ToInt32(Console.ReadLine());
-            if (opcion == 1)
+            try
             {
-                context.Paquete_Turisticos.Remove(paquete);
-                context.SaveChanges();
+                var context = new DataContext();
+                Console.WriteLine("Digite un Id de paquete Para Eliminar");
+                int selectedId = Convert.ToInt32(Console.ReadLine());
 
-                Console.WriteLine("paquete eliminado correctamente");
+                var paquete = context.Paquete_Turisticos.FirstOrDefault(p => p.PaqueteId == selectedId);
+
+                if (paquete == null)
+                {
+                    Console.WriteLine("Paquete no encontrado.");
+                    return;
+                }
+
+                Console.WriteLine("Seguro que desea eliminar? 1. Si, 2. No");
+                int opcion = Convert.ToInt32(Console.ReadLine());
+                if (opcion == 1)
+                {
+                    context.Paquete_Turisticos.Remove(paquete);
+                    context.SaveChanges();
+                    Console.WriteLine("Paquete eliminado correctamente");
+                    return;
+                }
+
+                Console.WriteLine("Eliminacion de paquete cancelada");
             }
-
-            Console.WriteLine("Eliminacion de paquete cancelada");
+            catch (FormatException)
+            {
+                Console.WriteLine("Error de formato. Asegúrate de ingresar un ID válido (número entero).");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al eliminar paquete: {ex.Message}");
+            }
         }
 
     }

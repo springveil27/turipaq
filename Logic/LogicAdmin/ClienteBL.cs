@@ -9,44 +9,55 @@ namespace turipaq.Logic.LogicAdmin
 
         public static void AgregarCliente(List<Cliente> clientes)
         {
-            var context = new DataContext();
-
-            Console.WriteLine("===== CREAR USUARIO  =====");
-            var id = GeneradorID(clientes.Count());
-            Console.Write("Ingrese su nombre ");
-            var nombre = Console.ReadLine();
-            Console.Write("Ingrese su apellido ");
-            var apellido = Console.ReadLine();
-            Console.Write("Ingresa el correo electronico: ");
-            var correo = Console.ReadLine();
-            Console.Write("Ingresa el numero de telefono: ");
-            var telefono = Console.ReadLine();
-            Console.Write("Ingresa tu documento de identidad");
-            var documentoIdentad = Console.ReadLine();
-            Console.Write("Ingresa un Usuario");
-            var usuario = Console.ReadLine();
-            Console.Write("Ingresa una contraseña");
-            var contrasena = Console.ReadLine();
-            Console.WriteLine("El usuario es administrador? 1.Si 2.No");
-            bool esAdmin = Convert.ToInt32(Console.ReadLine()) == 1;
-            Console.WriteLine("======================================");
-            Console.WriteLine();
-
-            var Cliente = new Cliente()
+            try
             {
-                ClienteId = id,
-                Nombre = nombre,
-                Apellido = apellido,
-                Correo = correo,
-                Telefono = telefono,
-                DocumentoIdentidad = documentoIdentad,
-                Usuario = usuario,
-                Contrasena = contrasena,
-                Admin = esAdmin
-            };
+                var context = new DataContext();
 
-            context.Clientes.Add(Cliente);
-            context.SaveChanges();
+                Console.WriteLine("===== CREAR USUARIO  =====");
+                var id = GeneradorID(clientes.Count());
+                Console.Write("Ingrese su nombre ");
+                var nombre = Console.ReadLine();
+                Console.Write("Ingrese su apellido ");
+                var apellido = Console.ReadLine();
+                Console.Write("Ingresa el correo electronico: ");
+                var correo = Console.ReadLine();
+                Console.Write("Ingresa el numero de telefono: ");
+                var telefono = Console.ReadLine();
+                Console.Write("Ingresa tu documento de identidad");
+                var documentoIdentad = Console.ReadLine();
+                Console.Write("Ingresa un Usuario");
+                var usuario = Console.ReadLine();
+                Console.Write("Ingresa una contraseña");
+                var contrasena = Console.ReadLine();
+                Console.WriteLine("El usuario es administrador? 1.Si 2.No");
+                bool esAdmin = Convert.ToInt32(Console.ReadLine()) == 1;
+                Console.WriteLine("======================================");
+                Console.WriteLine();
+
+                var Cliente = new Cliente()
+                {
+                    ClienteId = id,
+                    Nombre = nombre,
+                    Apellido = apellido,
+                    Correo = correo,
+                    Telefono = telefono,
+                    DocumentoIdentidad = documentoIdentad,
+                    Usuario = usuario,
+                    Contrasena = contrasena,
+                    Admin = esAdmin
+                };
+
+                context.Clientes.Add(Cliente);
+                context.SaveChanges();
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Ingresaste algun valor mal. asegurate de usar numero donde se te pide");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error inesperado: {ex.Message}");
+            }
         }
 
         public static void VerClienteEnPantalla()
@@ -76,20 +87,40 @@ namespace turipaq.Logic.LogicAdmin
 
         public static Cliente BuscarCliente()
         {
-            var context = new DataContext();
-            Console.WriteLine("Digite un Id de Paquete Para Mostrar");
-            int selectedId = Convert.ToInt32(Console.ReadLine());
+            try
+            {
+                var context = new DataContext();
+                Console.WriteLine("Digite un Id de Paquete Para Mostrar");
+                int selectedId = Convert.ToInt32(Console.ReadLine());
 
-            var cliente = context.Clientes.FirstOrDefault(p => p.ClienteId == selectedId);
+                var cliente = context.Clientes.FirstOrDefault(p => p.ClienteId == selectedId);
 
-            return cliente;
+                if (cliente == null)
+                {
+                    Console.WriteLine("Cliente no encontrado.");
+                }
+
+                return cliente;
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Formato de ID inválido. Por favor ingrese un número entero.");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($" Error al buscar cliente: {ex.Message}");
+                return null;
+            }
         }
 
         public static List<Cliente> BuscarCliente(int optionSearch, string searchTerm)
         {
-            var context = new DataContext();
+            try
             {
+                var context = new DataContext();
                 List<Cliente> ClienteSeleccionado = new List<Cliente>();
+
                 switch (optionSearch)
                 {
                     case 2:
@@ -117,6 +148,11 @@ namespace turipaq.Logic.LogicAdmin
 
                 return ClienteSeleccionado;
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al buscar cliente: {ex.Message}");
+                return new List<Cliente>();
+            }
         }
 
         public static void VerClientes()
@@ -129,97 +165,128 @@ namespace turipaq.Logic.LogicAdmin
 
         public static void EditarCliente()
         {
-            var context = new DataContext();
-            Console.WriteLine("Digite un  Id del paquete Para Editar");
-            int selectedId = Convert.ToInt32(Console.ReadLine());
-            var cliente = context.Clientes.Where(p => p.ClienteId == selectedId).FirstOrDefault();
-            Console.Write($"El Nombre: {cliente.Nombre}, Digite el Nuevo Nombre: ");
-            var nombre = Console.ReadLine();
-            Console.Write($"El apellido es: {cliente.Apellido}, Digite el nuevo apellido ");
-            var apellido = Console.ReadLine();
-            Console.Write($"El correo es: {cliente.Correo}, Digite el Nuevo correom: ");
-            var correo = Console.ReadLine();
-            Console.Write($"El Telefono es: {cliente.Telefono}, Ingrese el nuevo numero: ");
-            var telefono = Console.ReadLine();
-            Console.Write($"el documento  : {cliente.DocumentoIdentidad}, ingresa el nuevo e: ");
-            var documentoIdentidad = Console.ReadLine();
-            Console.Write($"Desea editar la contraseña? 1.Si 2.No ");
-            int selectOption = Convert.ToInt32(Console.ReadLine());
-            if (selectOption == 1)
+            try
             {
-                Console.Write($"Ingresa la contraseña actual: ");
-                var contrasenaActual = Console.ReadLine();
-                if (contrasenaActual == cliente.Contrasena)
+                var context = new DataContext();
+                Console.WriteLine("Digite un Id del paquete Para Editar");
+                int selectedId = Convert.ToInt32(Console.ReadLine());
+                var cliente = context.Clientes.Where(p => p.ClienteId == selectedId).FirstOrDefault();
+
+                if (cliente == null)
                 {
-                    Console.WriteLine("Ingresa una nueva contraseña");
-                    var contrasena = Console.ReadLine();
-                    cliente.Contrasena = contrasena;
+                    Console.WriteLine("Cliente no encontrado.");
+                    return;
                 }
-            }
 
-            Console.Write("Nombre (presiona espacio para omitir): ");
-            nombre = Console.ReadLine();
-            if (!string.IsNullOrEmpty(nombre) && nombre != " ")
-            {
-                cliente.Nombre = nombre;
-            }
+                Console.Write($"El Nombre: {cliente.Nombre}, Digite el Nuevo Nombre (presiona ENTER para omitir): ");
+                var nombre = Console.ReadLine();
+                if (!string.IsNullOrEmpty(nombre) && nombre != " ")
+                {
+                    cliente.Nombre = nombre;
+                }
 
-            Console.Write("Apellido (presiona espacio para omitir): ");
-            apellido = Console.ReadLine();
-            if (!string.IsNullOrEmpty(apellido) && apellido != " ")
-            {
-                cliente.Apellido = apellido;
-            }
+                Console.Write($"El apellido es: {cliente.Apellido}, Digite el nuevo apellido (presiona ENTER para omitir): ");
+                var apellido = Console.ReadLine();
+                if (!string.IsNullOrEmpty(apellido) && apellido != " ")
+                {
+                    cliente.Apellido = apellido;
+                }
 
-            Console.Write("Correo (presiona espacio para omitir): ");
-            correo = Console.ReadLine();
-            if (!string.IsNullOrEmpty(correo) && correo != " ")
-            {
-                cliente.Correo = correo;
-            }
+                Console.Write($"El correo es: {cliente.Correo}, Digite el Nuevo correo (presiona ENTER para omitir): ");
+                var correo = Console.ReadLine();
+                if (!string.IsNullOrEmpty(correo) && correo != " ")
+                {
+                    cliente.Correo = correo;
+                }
 
-            Console.Write("Teléfono (presiona espacio para omitir): ");
-            telefono = Console.ReadLine();
-            if (!string.IsNullOrEmpty(telefono) && telefono != " ")
-            {
-                cliente.Telefono = telefono;
-            }
+                Console.Write($"El Telefono es: {cliente.Telefono}, Ingrese el nuevo numero(presiona ENTER para omitir) : ");
+                var telefono = Console.ReadLine();
+                if (!string.IsNullOrEmpty(telefono) && telefono != " ")
+                {
+                    cliente.Telefono = telefono;
+                }
 
-            Console.Write("Documento de Identidad (presiona espacio para omitir): ");
-            documentoIdentidad = Console.ReadLine();
-            if (!string.IsNullOrEmpty(documentoIdentidad) && documentoIdentidad != " ")
-            {
-                cliente.DocumentoIdentidad = documentoIdentidad;
-            }
+                Console.Write($"el documento  : {cliente.DocumentoIdentidad}, ingresa el nuevo documento (presiona ENTER para omitir): ");
+                var documentoIdentidad = Console.ReadLine();
+                if (!string.IsNullOrEmpty(documentoIdentidad) && documentoIdentidad != " ")
+                {
+                    cliente.DocumentoIdentidad = documentoIdentidad;
+                }
 
-            if (cliente != null)
-            {
+                Console.Write($"Desea editar la contraseña? 1.Si 2.No ");
+                int selectOption = Convert.ToInt32(Console.ReadLine());
+                if (selectOption == 1)
+                {
+                    Console.Write($"Ingresa la contraseña actual: ");
+                    var contrasenaActual = Console.ReadLine();
+                    if (contrasenaActual == cliente.Contrasena)
+                    {
+                        Console.WriteLine("Ingresa una nueva contraseña");
+                        var contrasena = Console.ReadLine();
+                        cliente.Contrasena = contrasena;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Contraseña incorrecta. No se actualizó la contraseña.");
+                    }
+                }
+
                 context.Clientes.Update(cliente);
                 context.SaveChanges();
+                Console.WriteLine("Cliente actualizado correctamente.");
             }
-            else
+            catch (FormatException)
             {
-                Console.WriteLine("Cliente no encontrado.");
+                Console.WriteLine("Por favor, ingrese un ID válido (número entero).");
             }
+            catch (NullReferenceException)
+            {
+                Console.WriteLine("Error: Cliente no encontrado o datos incorrectos.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error inesperado: {ex.Message}");
+            }
+
         }
 
         public static void EliminarCliente()
         {
-            Console.WriteLine("Digite un Id de cliente Para Eliminar");
-            int selectedId = Convert.ToInt32(Console.ReadLine());
-            var context = new DataContext();
-            var cliente = context.Clientes.Where(p => p.ClienteId == selectedId).FirstOrDefault();
-            Console.WriteLine("Seguro que desea eliminar? 1. Si, 2. No");
-            int opcion = Convert.ToInt32(Console.ReadLine());
-            if (opcion == 1)
+            try
             {
-                context.Clientes.Remove(cliente);
-                context.SaveChanges();
-                Console.WriteLine("Cliente eliminado correctamente");
-            }
+                Console.WriteLine("Digite un Id de cliente Para Eliminar");
+                int selectedId = Convert.ToInt32(Console.ReadLine());
+                var context = new DataContext();
+                var cliente = context.Clientes.Where(p => p.ClienteId == selectedId).FirstOrDefault();
 
-            Console.WriteLine("Eliminacion de Cliente cancelada");
+                if (cliente == null)
+                {
+                    Console.WriteLine("Cliente no encontrado.");
+                    return;
+                }
+
+                Console.WriteLine("Seguro que desea eliminar? 1. Si, 2. No");
+                int opcion = Convert.ToInt32(Console.ReadLine());
+                if (opcion == 1)
+                {
+                    context.Clientes.Remove(cliente);
+                    context.SaveChanges();
+                    Console.WriteLine("Cliente eliminado correctamente");
+                    return;
+                }
+
+                Console.WriteLine("Eliminacion de Cliente cancelada");
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Error de formato. Asegúrate de ingresar numeros validos.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($" Error al eliminar cliente: {ex.Message}");
+            }
         }
     }
-}
+    }
+
 

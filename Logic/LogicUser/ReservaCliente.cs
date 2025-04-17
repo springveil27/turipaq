@@ -15,11 +15,14 @@ namespace turipaq.Logic.LogicUser
         }
         public static void CrearReserva(List<Reserva> reservas, List<PaqueteTuristico> paquetes)
         {
-
+            bool running= true;
+            while (running) { 
             Console.WriteLine("===== Hacer Reserva  =====");
             var context = new DataContext();
             DateTime fechaReserva = DateTime.Now;
+
             PaqueteBL.verPaquetes(paquetes);
+             
 
             var cliente = context.Clientes.FirstOrDefault(c => c.ClienteId == LogicLogin.UsuarioIniciado.ClienteId);
 
@@ -36,11 +39,17 @@ namespace turipaq.Logic.LogicUser
             Console.WriteLine();
 
             paquete.ReservasActuales++;
-            if (paquete.ReservasActuales >= 3)
+            if (paquete.ReservasActuales >= 10)
             {
                 paquete.Disponibilidad = false;
                 Console.WriteLine("Este fue el último cupo. El paquete ya no estará disponible.");
             }
+            if (paquete.Disponibilidad == false)
+            {
+                Console.WriteLine("Error, este paquete ya no esta disponible");
+                    running = false;
+                    break;
+                }
 
             var Reserva = new Reserva()
             {
@@ -54,48 +63,50 @@ namespace turipaq.Logic.LogicUser
 
             context.Reservas.Add(Reserva);
             context.SaveChanges();
-            Console.WriteLine("Reserva realizada con correctamente");
-
             List<Pago> pagos = new List<Pago>();
             List<PaqueteTuristico> monto = new List<PaqueteTuristico>();
             PagoBL.Pagar(pagos, Reserva.ReservaId);
+            Console.WriteLine("Reserva realizada con correctamente");
+                running = false;
+        }
         }
         public static void VerMiReserva(List<Reserva> reservas)
         {
             var context = new DataContext();
             foreach (var reserva in reservas)
             {
-            var paquete = context.Paquete_Turisticos.Find(reserva.PaqueteId);
-                
-
-                Console.WriteLine($"|Lugar de viaje: {paquete.Destino} |ID: {reserva.ReservaId}|ID reserva: {reserva.PaqueteId} | Cliente ID: {reserva.ClienteId} |Fecha de reserva{reserva.FechaReserva}|  fecha de viaje {reserva.FechaViaje}  |codigo de confirmacion {reserva.CódigoConfirmación} |");
+                var paquete = context.Paquete_Turisticos.Find(reserva.PaqueteId);
+                Console.WriteLine($"|Lugar de viaje: {paquete.Destino} |ID: {reserva.ReservaId}|ID paquete: {reserva.PaqueteId} | Cliente ID: {reserva.ClienteId} |Fecha de reserva: {reserva.FechaReserva}| Fecha de viaje: {reserva.FechaViaje} |Código de confirmación: {reserva.CódigoConfirmación} |");
             }
             Console.ReadKey();
         }
 
-        public static void VerReservaBuscada(List<Reserva> reservas)
+        public static void VerReservaBuscada()
         {
-            var context = new DataContext();
-            var reserva = BuscarReserva();
-            VerMiReserva(reservas);
+            var reservas = BuscarReservasPorCliente();
+            if (reservas != null && reservas.Any())
+            {
+                VerMiReserva(reservas);
+            }
+            else
+            {
+                Console.WriteLine("No se encontraron reservas para el cliente actual.");
+                Console.ReadKey();
+            }
         }
 
-        public static Reserva BuscarReserva()
+        public static List<Reserva> BuscarReservasPorCliente()
         {
             var context = new DataContext();
-            int idSeleccionado = LogicLogin.UsuarioIniciado.ClienteId;
-            var reserva = context.Reservas.FirstOrDefault(p => p.ClienteId == idSeleccionado);
-
-            return reserva;
+            int clienteId = LogicLogin.UsuarioIniciado.ClienteId;
+            var reservas = context.Reservas.Where(r => r.ClienteId == clienteId).ToList();
+            return reservas;
         }
 
-
-
-        public static void VerReservas(List<Reserva> reservas)
+        public static void VerTodasLasReservas()
         {
             var context = new DataContext();
-            reservas = context.Reservas.ToList();
-
+            var reservas = context.Reservas.ToList();
             VerMiReserva(reservas);
         }
 

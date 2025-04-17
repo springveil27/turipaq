@@ -1,13 +1,13 @@
-﻿using System;
-using turipaq.Login;
-using turipaq.entities_model;
-using Microsoft.EntityFrameworkCore;
+﻿using turipaq.Login;
 using turipaq.entities_model;
 using turipaq.Logic.LogicUser;
 
 bool running = true;
 while (running)
 {
+    try
+    {
+
     Console.Clear();
     List<Cliente> clientes = new List<Cliente>();
     Console.WriteLine("===== TURIPAQ =====");
@@ -32,9 +32,20 @@ while (running)
         case 3:
             running = false;
             break;
+        default:
+            Console.Clear();
+                Console.WriteLine("INGRESA UN NUMERO VALIDO\n");
+                Console.WriteLine("Presiona ENTER para continuar");
+                Console.ReadKey();
+                break;
     }
-    if (opcion < 1 && opcion > 3)
-    {
-        Console.WriteLine("Ingrese una opcion valida");
-    }
+    }catch(Exception ex)
+                            {
+        Console.Clear();
+        Console.WriteLine("ERROR: El programa solo permite numero\n");
+        Console.WriteLine("Presiona ENTER para continuar");
+        Console.ReadKey();
+
+}
+
 }
