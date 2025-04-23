@@ -6,9 +6,9 @@ using turipaq.Login;
 
 namespace turipaq.Logic.LogicUser
 {
-    public class ReservaCliente
+    public class ReservaCliente : IGeneradorCodigo
     {
-        public static string GenerarCodigoUnico()
+        public string GenerarCodigoUnico()
         {
             string guid = Guid.NewGuid().ToString("N");
             return guid.Substring(0, 10).ToUpper();
@@ -32,9 +32,10 @@ namespace turipaq.Logic.LogicUser
             var idUsuario = LogicLogin.UsuarioIniciado.ClienteId;
             Console.Write("en que fecha desea viajar (dd/MM/yyyy): ");
             var fechaViaje = Console.ReadLine();
+                var generador = new ReservaCliente();
+                var CodigoUnico = generador.GenerarCodigoUnico();
 
-            var CodigoUnico = GenerarCodigoUnico();
-            var fecha = fechaReserva.ToString();
+                var fecha = fechaReserva.ToString();
             Console.WriteLine("======================================");
             Console.WriteLine();
 
